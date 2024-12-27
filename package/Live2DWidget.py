@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QOpenGLWidget
 import random
 import PyLive2D
 
-
 class Live2DWidget(QOpenGLWidget):
     def __init__(self, *args, path: str, parent=None, **kwargs) -> None:
         self.path = path
@@ -13,6 +12,9 @@ class Live2DWidget(QOpenGLWidget):
             raise FileNotFoundError(f"path({path}) not found...")
 
         super().__init__(parent)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground, True)
         self.setMouseTracking(True)
 
     def initializeGL(self) -> None:
@@ -29,8 +31,15 @@ class Live2DWidget(QOpenGLWidget):
         if event.timerId() == self.refresh:
             self.update()
 
+    def mousePressEvent(self, a0: QMouseEvent | None):
+        if a0 and a0.button() == Qt.LeftButton:
+            self.drag_position = a0.globalPos() - self.frameGeometry().topLeft()
+        a0.accept()
+
     def mouseReleaseEvent(self, a0: QMouseEvent | None):
         if a0 and a0.button() == Qt.LeftButton:
+            del self.drag_position
+
             pos = a0.pos()
             area = self.model.hit_area(pos.x(), pos.y())
             if area == "Head":
@@ -39,12 +48,13 @@ class Live2DWidget(QOpenGLWidget):
             elif area == "Body":
                 idx = random.randrange(0, len(self.motion_ids))
                 self.model.set_motion(self.motion_ids[idx])
-        super().mouseReleaseEvent(a0)
+        a0.accept()
 
-    def mouseMoveEvent(self, event: QMouseEvent | None):
-        self.model.set_dragging(event.x(), event.y())
-        super().mouseMoveEvent(event)
-
+    def mouseMoveEvent(self, a0: QMouseEvent | None):
+        if a0 and hasattr(self, "drag_position"):
+            self.move(a0.globalPos() - self.drag_position)
+        self.model.set_dragging(a0.x(), a0.y())
+        a0.accept()
 
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication

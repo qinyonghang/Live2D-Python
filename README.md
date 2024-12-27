@@ -63,7 +63,6 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
     import random
     import PyLive2D
 
-
     class Live2DWidget(QOpenGLWidget):
         def __init__(self, *args, path: str, parent=None, **kwargs) -> None:
             self.path = path
@@ -71,6 +70,9 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
                 raise FileNotFoundError(f"path({path}) not found...")
 
             super().__init__(parent)
+            self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+            self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+            self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground, True)
             self.setMouseTracking(True)
 
         def initializeGL(self) -> None:
@@ -87,8 +89,15 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
             if event.timerId() == self.refresh:
                 self.update()
 
+        def mousePressEvent(self, a0: QMouseEvent | None):
+            if a0 and a0.button() == Qt.LeftButton:
+                self.drag_position = a0.globalPos() - self.frameGeometry().topLeft()
+            a0.accept()
+
         def mouseReleaseEvent(self, a0: QMouseEvent | None):
             if a0 and a0.button() == Qt.LeftButton:
+                del self.drag_position
+
                 pos = a0.pos()
                 area = self.model.hit_area(pos.x(), pos.y())
                 if area == "Head":
@@ -97,12 +106,13 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
                 elif area == "Body":
                     idx = random.randrange(0, len(self.motion_ids))
                     self.model.set_motion(self.motion_ids[idx])
-            super().mouseReleaseEvent(a0)
+            a0.accept()
 
-        def mouseMoveEvent(self, event: QMouseEvent | None):
-            self.model.set_dragging(event.x(), event.y())
-            super().mouseMoveEvent(event)
-
+        def mouseMoveEvent(self, a0: QMouseEvent | None):
+            if a0 and hasattr(self, "drag_position"):
+                self.move(a0.globalPos() - self.drag_position)
+            self.model.set_dragging(a0.x(), a0.y())
+            a0.accept()
 
     if __name__ == "__main__":
         from PyQt5.QtWidgets import QApplication
@@ -114,6 +124,10 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
         w.show()
         sys.exit(app.exec())
     ```
+
+### 展示
+![Live2DWidget 示例效果](package/display.png "Live2DWidget 示例效果")
+
 
 ## 三方库引用说明
 
