@@ -1,0 +1,7 @@
+.conda
+.venv
+.vscode
+**/build
+**/install
+*.egg-info
+third_party/

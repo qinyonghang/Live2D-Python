@@ -1,0 +1,90 @@
+---
+# Clang 格式样式选项查看：https://releases.llvm.org/3.4/tools/clang/docs/ClangFormatStyleOptions.html
+Language: Cpp
+BasedOnStyle: Google
+Standard: Auto
+
+# codingrule 3.2.3
+ColumnLimit: 100
+
+# codingrule 3.2.4
+UseTab: Never
+IndentWidth: 4
+
+# indent
+ContinuationIndentWidth: 4
+IndentCaseLabels: true
+
+# braces
+AlignAfterOpenBracket: Align
+BreakBeforeBraces: Attach
+Cpp11BracedListStyle: true
+
+AccessModifierOffset: -4
+
+# pointer
+DerivePointerAlignment: false
+DerivePointerBinding: false
+PointerBindsToType: false
+PointerAlignment: Left
+
+# comments
+SpacesBeforeTrailingComments: 2
+ReflowComments: false
+AlignTrailingComments: true
+
+# function 
+AllowShortFunctionsOnASingleLine: Inline
+IndentFunctionDeclarationAfterType: false
+AlwaysBreakAfterReturnType: None
+AllowAllParametersOfDeclarationOnNextLine: true
+
+# include
+SortIncludes: true
+IncludeBlocks:   Regroup
+
+# if condition
+AllowShortIfStatementsOnASingleLine: false
+
+# empty line limit
+MaxEmptyLinesToKeep: 1
+
+# namespace
+CompactNamespaces: false
+FixNamespaceComments: true
+NamespaceIndentation: None
+
+# construction
+ConstructorInitializerIndentWidth: 8
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+BreakConstructorInitializersBeforeComma: false
+
+# template
+AlwaysBreakTemplateDeclarations: true
+
+# empty line
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# loop or block on single line
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+# break
+AlwaysBreakBeforeMultilineStrings: false
+BreakBeforeBinaryOperators: false
+BreakBeforeTernaryOperators: true
+BinPackParameters: false
+
+# space
+SpacesInParentheses: false
+SpacesInAngles: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpaceAfterControlStatementKeyword: true
+SpaceBeforeAssignmentOperators: true
+
+# align
+AlignEscapedNewlinesLeft: false
+AlignOperands: false
+...
