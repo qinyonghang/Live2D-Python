@@ -1,7 +1,9 @@
 .conda
 .venv
 .vscode
+*.egg-info
+*.pyd
+*.so
 **/build
 **/install
-*.egg-info
-third_party/
+**/__pycache__

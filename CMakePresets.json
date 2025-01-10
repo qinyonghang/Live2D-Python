@@ -1,0 +1,105 @@
+{
+    "version": 10,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 23,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "Windows",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "displayName": "Windows Configuration",
+            "description": "Windows configuration for building the project.",
+            "binaryDir": "${sourceDir}/build/windows",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "${sourceDir}/install"
+                }
+            }
+        },
+        {
+            "name": "Linux",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "displayName": "Linux Configuration",
+            "description": "Linux configuration for building the project.",
+            "binaryDir": "${sourceDir}/build/linux",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "${sourceDir}/install"
+                },
+                "GLFW_BUILD_WAYLAND": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                }
+            }
+        },
+        {
+            "name": "Linux_Debug",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "displayName": "Linux Debug Configuration",
+            "description": "Linux Debug configuration for building the project.",
+            "binaryDir": "${sourceDir}/build/linux",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Debug"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "${sourceDir}/install"
+                },
+                "GLFW_BUILD_WAYLAND": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                }
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "Windows",
+            "configurePreset": "Windows",
+            "configuration": "Release",
+            "targets": [
+                "ALL_BUILD"
+            ]
+        },
+        {
+            "name": "Linux",
+            "configurePreset": "Linux",
+            "configuration": "Release"
+        },
+        {
+            "name": "Linux_Debug",
+            "configurePreset": "Linux_Debug",
+            "configuration": "Debug"
+        }
+    ]
+}

@@ -20,7 +20,17 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
 
 2. **安装依赖**
 
-    本项目没有额外的 Python 依赖项，但需要确保系统中已安装 CMake 和 C++ 编译器。
+    本项目需要以下 Python 依赖项：
+    
+    - requests
+    
+    可以通过 pip 安装：
+    
+    ```bash
+    pip install requests
+    ```
+
+    同时需要确保系统中已安装 CMake 和 C++ 编译器。
 
 3. **构建和安装**
 
@@ -33,15 +43,7 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
 如果你希望从源代码构建，请确保已经安装了必要的编译工具链，并运行以下命令：
 
     ```bash
-    python setup.py build_ext --inplace
-    ```
-
-需要注意的是，由于boost和VS 2022的兼容性问题，boost的构建需要单独进行。
-
-    ```bash
-    python scripts\\replace.py ${boost_root}\\tools\\build\\src\\tools\\msvc.jam
-    bootstrap.bat
-    .\b2.exe --with-python link=shared address-model=64 variant=release
+    pip install -v -e .
     ```
 
 ## 使用说明
@@ -133,7 +135,7 @@ PyLive2D 是对 Live2D Cubism SDK 的 Python 封装，旨在为 Python 开发者
 
 本项目引用了多个第三方库。使用这些库时，需遵守其各自的许可证条款，并向相关作者获取授权。以下是本项目所使用的第三方库列表及联系方式：
 
-- **common**：由 qinyonghang 维护，[GitHub](https://github.com/qinyonghang/common)，联系邮箱：yonghang.qin@gmail.com
+- **qlib**：由 qinyonghang 维护，[GitHub](https://github.com/qinyonghang/qlib)，联系邮箱：yonghang.qin@gmail.com
 - **spdlog**：轻量级 C++ 日志库，[GitHub](https://github.com/gabime/spdlog)，遵循 MIT 许可证
 - **glfw**：跨平台窗口和 OpenGL 上下文创建库，[GitHub](https://github.com/glfw/glfw)，遵循 zlib/libpng 许可证
 - **glew**：OpenGL 扩展加载库，[GLEW 官网](http://glew.sourceforge.net/)，遵循 BSD 许可证

@@ -16,7 +16,7 @@ BOOST_PYTHON_MODULE(PyLive2D) {
         char* end_ptr = nullptr;
         auto level = std::strtol(level_str, &end_ptr, 10);
         if (*end_ptr != '\0') {
-            qMWarn("Live2DLogLevel is not a number...");
+            qWarn("Live2DLogLevel is not a number...");
         } else {
             Live2D::Register::set_log_level(level);
         }

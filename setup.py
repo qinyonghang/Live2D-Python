@@ -83,10 +83,13 @@ class CMakeBuild(build_ext):
         shutil.copy(pyd_file, extdir)
         print(f"Copying {pyd_file} to ext directory: {extdir}")
 
-        other_files = glob.glob(os.path.join(build_folder, "*.dll"))
-        for other_file in other_files:
-            shutil.copy(other_file, extdir)
-            print(f"Copying {other_file} to ext directory: {extdir}")
+        if platform.system() == "Windows":
+            other_libs = glob.glob(os.path.join(build_folder, "*.dll"))
+        elif platform.system() == "Linux":
+            other_libs = glob.glob(os.path.join(build_folder, "*.so"))
+        for lib in other_libs:
+            shutil.copy(lib, extdir)
+            print(f"Copying {lib} to ext directory: {extdir}")
 
 
 setup(

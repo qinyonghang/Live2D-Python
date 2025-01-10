@@ -1,18 +1,15 @@
 import sys
-import re
 
 
-def replace_in_file(file_path):
+def replace(file_path, pattern, replacement):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
 
-        pattern = r'MATCH "\(14\.3\)"'
-        replacement = r'MATCH "(14.[34])"'  # 修正替换字符串
-        new_content = re.sub(pattern, replacement, content)
+        content = content.replace(pattern, replacement)
 
         with open(file_path, "w", encoding="utf-8") as file:
-            file.write(new_content)
+            file.write(content)
 
         print(f"Successfully replaced content in {file_path}")
     except Exception as e:
@@ -20,10 +17,13 @@ def replace_in_file(file_path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python replace.py <file_path>")
+    if len(sys.argv) != 4:
+        print("Usage: python replace.py <file_path> <pattern> <replacement>")
+        print(sys.argv)
         sys.exit(1)
 
     file_path = sys.argv[1]
-    print(f"Replacing content in {file_path}")
-    replace_in_file(file_path)
+    pattern = sys.argv[2]
+    replacement = sys.argv[3]
+    print(f"Replacing content in {file_path}, pattern: {pattern}, replacement: {replacement}")
+    replace(file_path, pattern, replacement)
