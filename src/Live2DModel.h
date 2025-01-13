@@ -17,6 +17,12 @@ namespace Live2D {
 
 class LIVE2D_API Model : public QObject {
 public:
+    enum : int32_t {
+        OK = 0,
+        ERR_MODEL_NOT_EXIST = -1,
+        ERR_OPENGL_INIT = -2,
+    };
+
     template <typename String>
     Model(String&& model_path, size_t width, size_t height) : QObject(nullptr) {
         int32_t result{init(std::forward<String>(model_path), width, height)};
@@ -41,7 +47,5 @@ public:
 protected:
     std::shared_ptr<QObject> __impl;
 };
-
-int32_t LIVE2D_API Live2DMain(int32_t argc, char** argv);
 
 }  // namespace Live2D

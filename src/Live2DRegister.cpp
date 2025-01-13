@@ -8,7 +8,6 @@
 #include "ICubismAllocator.hpp"
 #include "Math/CubismMatrix44.hpp"
 #include "QException.h"
-#include "QLog.h"
 
 using namespace Live2D::Cubism::Framework;
 
@@ -53,15 +52,12 @@ class Allocator : public Csm::ICubismAllocator {
     }
 };
 
-struct RegisterImpl : public QObject {
-    Allocator allocator;
-    Csm::CubismFramework::Option option;
-    std::shared_ptr<void> destroy;
-};
+Allocator allocator;
+Csm::CubismFramework::Option option;
+std::shared_ptr<void> destroy;
 
 void print(char const* message) {
     std::cout << message;
-    // qLogger().log(spdlog::level::trace, message);
 }
 };  // namespace
 
@@ -75,25 +71,19 @@ int32_t Register::init() {
             break;
         }
 
-        auto impl = std::make_shared<RegisterImpl>();
+        option.LogFunction = print;
+        option.LoggingLevel = static_cast<decltype(option.LoggingLevel)>(default_level);
 
-        impl->option.LogFunction = print;
-        impl->option.LoggingLevel = static_cast<decltype(impl->option.LoggingLevel)>(default_level);
-        qLogger().set_level(default_level);
-
-        CubismFramework::StartUp(&impl->allocator, &impl->option);
+        CubismFramework::StartUp(&allocator, &option);
         CubismFramework::Initialize();
-        qCMDebug("Live2D Register End!");
 
-        impl->destroy = std::shared_ptr<void>(nullptr, [](void*) {
+        destroy = std::shared_ptr<void>(nullptr, [](void*) {
             if (__register) {
                 CubismFramework::Dispose();
-                qMDebug("Live2D UnRegister End!");
                 __register = false;
             }
         });
 
-        __impl = impl;
         __register = true;
     } while (0);
 
@@ -101,12 +91,6 @@ int32_t Register::init() {
 }
 
 void Register::set_log_level(size_t level) {
-    auto instance = QSingletonProductor<Register>::get_instance();
-    auto impl = std::dynamic_pointer_cast<RegisterImpl>(instance.__impl);
-    if (impl != nullptr) {
-        qLogger().set_level(level);
-        impl->option.LoggingLevel = static_cast<decltype(impl->option.LoggingLevel)>(level);
-        qMInfo("level={}", level);
-    }
+    option.LoggingLevel = static_cast<decltype(option.LoggingLevel)>(level);
 }
 };  // namespace Live2D

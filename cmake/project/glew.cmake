@@ -5,17 +5,23 @@ set(${LIB_NAME}_URL_HASH "sha256:a9046a913774395a095edcc0b0ac2d81c3aacca61787b39
 set(${LIB_NAME}_DOWNLOAD_DIR ${PROJECT_SOURCE_DIR}/third_party)
 set(${LIB_NAME}_DOWNLOAD_NAME ${LIB_NAME}.zip)
 set(${LIB_NAME}_SOURCE_DIR ${${LIB_NAME}_DOWNLOAD_DIR}/${LIB_NAME})
+set(${LIB_NAME}_CMAKE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DOpenGL_GL_PREFERENCE=GLVND -DBUILD_UTILS=OFF -DBUILD_SHARED_LIBS=OFF")
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build2/linux)
 set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install/linux)
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 8)
 set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build2/windows)
 set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install/windows)
+set(${LIB_NAME}_CMAKE_ARGS "-A x64 ${${LIB_NAME}_CMAKE_ARGS}")
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build2/win32)
+set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install/win32)
+set(${LIB_NAME}_CMAKE_ARGS "-A Win32 ${${LIB_NAME}_CMAKE_ARGS}")
+else()
+message(FATAL_ERROR "Unsupported platform")
 endif()
 
 if (NOT EXISTS ${${LIB_NAME}_INSTALL_DIR})
-
-set(cmake_args "-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DOpenGL_GL_PREFERENCE=GLVND -DBUILD_UTILS=OFF -DBUILD_SHARED_LIBS=OFF")
 
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E env 
@@ -29,7 +35,7 @@ execute_process(
             --build_dir ${${LIB_NAME}_BUILD_DIR}
             --install_dir ${${LIB_NAME}_INSTALL_DIR}
             --cmakelists_dir ${${LIB_NAME}_SOURCE_DIR}/build/cmake
-            --cmake_args ${cmake_args}
+            --cmake_args ${${LIB_NAME}_CMAKE_ARGS}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         RESULT_VARIABLE result
         COMMAND_ECHO STDOUT

@@ -6,11 +6,18 @@ set(${LIB_NAME}_DOWNLOAD_DIR ${PROJECT_SOURCE_DIR}/third_party)
 set(${LIB_NAME}_DOWNLOAD_NAME ${LIB_NAME}.tar.gz)
 set(${LIB_NAME}_SOURCE_DIR ${${LIB_NAME}_DOWNLOAD_DIR}/${LIB_NAME})
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build2/linux)
+set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build/linux)
 set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install/linux)
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build2/windows)
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build/windows)
 set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install/windows)
+set(${LIB_NAME}_CMAKE_ARGS "-A x64")
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+set(${LIB_NAME}_BUILD_DIR ${${LIB_NAME}_SOURCE_DIR}/build/win32)
+set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install/win32)
+set(${LIB_NAME}_CMAKE_ARGS "-A Win32")
+else()
+message(FATAL_ERROR "Unsupported platform")
 endif()
 
 if (NOT EXISTS ${${LIB_NAME}_INSTALL_DIR})
@@ -26,6 +33,7 @@ execute_process(
             --source_dir ${${LIB_NAME}_SOURCE_DIR}
             --build_dir ${${LIB_NAME}_BUILD_DIR}
             --install_dir ${${LIB_NAME}_INSTALL_DIR}
+            --cmake_args ${${LIB_NAME}_CMAKE_ARGS}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         RESULT_VARIABLE result
         COMMAND_ECHO STDOUT

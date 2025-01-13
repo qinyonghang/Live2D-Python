@@ -30,6 +30,29 @@
             }
         },
         {
+            "name": "Windows x86",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "displayName": "Windows x86 Configuration",
+            "description": "Windows x86 configuration for building the project.",
+            "binaryDir": "${sourceDir}/build/win32",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "Win32",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                },
+                "CMAKE_INSTALL_PREFIX": {
+                    "type": "STRING",
+                    "value": "${sourceDir}/install"
+                }
+            }
+        },
+        {
             "name": "Linux",
             "condition": {
                 "type": "equals",
@@ -64,7 +87,7 @@
             },
             "displayName": "Linux Debug Configuration",
             "description": "Linux Debug configuration for building the project.",
-            "binaryDir": "${sourceDir}/build/linux",
+            "binaryDir": "${sourceDir}/build/linux_debug",
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -86,6 +109,14 @@
         {
             "name": "Windows",
             "configurePreset": "Windows",
+            "configuration": "Release",
+            "targets": [
+                "ALL_BUILD"
+            ]
+        },
+        {
+            "name": "Windows x86",
+            "configurePreset": "Windows x86",
             "configuration": "Release",
             "targets": [
                 "ALL_BUILD"

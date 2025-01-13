@@ -18,14 +18,17 @@ class Live2DWidget(QOpenGLWidget):
         self.setMouseTracking(True)
 
     def initializeGL(self) -> None:
+        print("initializeGL: Start:")
         self.makeCurrent()
         self.model = PyLive2D.Model(self.path, self.width(), self.height())
         self.expression_ids = self.model.expression_ids()
         self.motion_ids = self.model.motion_ids()
         self.refresh = self.startTimer(33)
+        print("initializeGL: End!")
 
     def paintGL(self) -> None:
-        self.model.draw(self.width(), self.height())
+        if hasattr(self, 'model'):
+            self.model.draw(self.width(), self.height())
 
     def timerEvent(self, event: QTimerEvent | None):
         if event.timerId() == self.refresh:

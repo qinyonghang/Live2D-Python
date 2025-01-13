@@ -82,7 +82,7 @@ int32_t main(int32_t argc, char** argv) {
 
         argparse::ArgumentParser program("Live2D Viewer");
 
-        program.add_argument("config").nargs(1u).default_value("config.yaml");
+        program.add_argument("model").nargs(1u).required();
 
         try {
             program.parse_args(argc, argv);
@@ -121,10 +121,9 @@ int32_t main(int32_t argc, char** argv) {
         int width, height;
         glfwGetWindowSize(window, &width, &height);
 
-        auto config = program.get<std::string>("config");
+        auto model_path = program.get<std::string>("model");
         qMTrace("Initialize Start:");
-        auto live2d = std::make_shared<Live2D::Register>();
-        auto model = std::make_shared<Live2D::Model>(config, width, height);
+        auto model = std::make_shared<Live2D::Model>(model_path, width, height);
         qMTrace("Initialize End!");
 
         UserObject object;

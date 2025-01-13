@@ -41,7 +41,15 @@ set_target_properties(Live2DCubismCore
     INTERFACE_INCLUDE_DIRECTORIES ${core_dir}/include
 )
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-set(CORE_LIB_SUFFIX ${core_dir}/lib/windows/x86_64/143)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+set(CORE_LIB_SUFFIX ${core_dir}/lib/windows/x86_64/${MSVC_TOOLSET_VERSION})
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+set(CORE_LIB_SUFFIX ${core_dir}/lib/windows/x86/${MSVC_TOOLSET_VERSION})
+else()
+message(FATAL_ERROR "Unsupported architecture")
+endif()
+
 set_target_properties(Live2DCubismCore
   PROPERTIES
     IMPORTED_LOCATION_DEBUG

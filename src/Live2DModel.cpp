@@ -26,7 +26,6 @@
 #include "Live2DRegister.h"
 // #include "Live2DView.h"
 #include "QException.h"
-#include "QLog.h"
 
 #ifdef WIN32
 #include <GL/wglew.h>
@@ -36,6 +35,7 @@ using namespace Live2D::Cubism::Framework;
 
 namespace {
 struct ModelImpl : public QObject {
+    Live2D::Register _register;
     size_t width;
     size_t height;
     std::shared_ptr<LAppModel> model;
@@ -50,13 +50,18 @@ struct ModelImpl : public QObject {
 namespace Live2D {
 
 int32_t Model::init(std::string model_path, size_t width, size_t height) {
-    qCMInfo("model_path={}, width={}, height={}", model_path, width, height);
     int32_t result{0};
 
     do {
+        std::filesystem::path path(model_path);
+        if (!std::filesystem::exists(path)) {
+            result = ERR_MODEL_NOT_EXIST;
+            break;
+        }
+
         result = glewInit();
         if (result != 0) {
-            qCMCCritical("glewInit return {}", result);
+            result = ERR_OPENGL_INIT;
             break;
         }
 
@@ -66,16 +71,7 @@ int32_t Model::init(std::string model_path, size_t width, size_t height) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // glViewport(0, 0, width, height);
-
         auto impl = std::make_shared<ModelImpl>();
-
-        std::filesystem::path path(model_path);
-        if (!std::filesystem::exists(path)) {
-            qCError("model_path={} does not exist", path.string());
-            result = -1;
-            break;
-        }
 
         auto view = std::make_shared<LAppView>();
         view->Initialize(width, height);
@@ -85,12 +81,6 @@ int32_t Model::init(std::string model_path, size_t width, size_t height) {
 
         model->LoadAssets((path.parent_path().string() + "/").c_str(),
                           path.filename().string().c_str());
-
-        // float clearColor[3] = {1.0f, 1.0f, 1.0f};
-        // view->SetRenderTargetClearColor(clearColor[0], clearColor[1], clearColor[2]);
-
-        //default proj
-        CubismMatrix44 projection;
 
         LAppPal::UpdateTime();
 
@@ -115,7 +105,6 @@ void Model::set_background(std::string background) {
     }
 
     // impl->view->set_background(background);
-    qCMInfo("background={}", background);
 }
 
 void Model::draw(size_t width, size_t height) {
@@ -221,7 +210,6 @@ void Model::set_expression(std::string const& id) {
         QCMTHROW_EXCEPTION("impl is nullptr");
     }
 
-    qCTrace("set_expression: id={}", id);
     impl->model->SetExpression(id.c_str());
 }
 
@@ -231,7 +219,6 @@ void Model::set_motion(std::string const& id, std::string sound_file, int32_t pr
         QCMTHROW_EXCEPTION("impl is nullptr");
     }
 
-    qCMTrace("set_motion: id={} sound_file={} {}", id, sound_file, priority);
     impl->model->StartMotion(id, sound_file, priority, nullptr);
 }
 

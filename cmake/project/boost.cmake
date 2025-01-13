@@ -6,8 +6,14 @@ set(${LIB_NAME}_DOWNLOAD_NAME ${LIB_NAME}.tar.gz)
 set(${LIB_NAME}_SOURCE_DIR ${${LIB_NAME}_DOWNLOAD_DIR}/${LIB_NAME})
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install2/linux)
-elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 8)
+set(${LIB_NAME}_ADDRESS_MODE "address-model=64")
 set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install2/windows)
+elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+set(${LIB_NAME}_INSTALL_DIR ${${LIB_NAME}_SOURCE_DIR}/install2/win32)
+set(${LIB_NAME}_ADDRESS_MODE "address-model=32")
+else()
+message(FATAL_ERROR "Unsupported system")
 endif()
 
 if (NOT EXISTS ${${LIB_NAME}_INSTALL_DIR})
@@ -30,7 +36,7 @@ execute_process(
             --download_name ${${LIB_NAME}_DOWNLOAD_NAME}
             --source_dir ${${LIB_NAME}_SOURCE_DIR}
             --install_dir ${${LIB_NAME}_INSTALL_DIR}
-            --custom_compile "${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/replace.py ${${LIB_NAME}_SOURCE_DIR}/libs/python/src/numpy/dtype.cpp \"reinterpret_cast<PyArray_Descr*>(ptr())->elsize\" \"0\"" "${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/replace.py ${${LIB_NAME}_SOURCE_DIR}/tools/build/src/tools/msvc.jam \"(14.3)\" \"(14.[34])\"" "${bootstrap}" "${b2} --with-python --link=static" "${b2} install --with-python --link=static --prefix=${${LIB_NAME}_INSTALL_DIR}"
+            --custom_compile "${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/replace.py ${${LIB_NAME}_SOURCE_DIR}/libs/python/src/numpy/dtype.cpp \"reinterpret_cast<PyArray_Descr*>(ptr())->elsize\" \"0\"" "${Python3_EXECUTABLE} ${PROJECT_SOURCE_DIR}/scripts/replace.py ${${LIB_NAME}_SOURCE_DIR}/tools/build/src/tools/msvc.jam \"(14.3)\" \"(14.[34])\"" "${bootstrap}" "${b2} install ${${LIB_NAME}_ADDRESS_MODE} --with-python --link=static --prefix=${${LIB_NAME}_INSTALL_DIR}"
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         RESULT_VARIABLE result
         COMMAND_ECHO STDOUT

@@ -1,6 +1,5 @@
 #include "Live2DModel.h"
 #include "Live2DRegister.h"
-#include "QLog.h"
 #include "boost/python.hpp"
 #include "boost/python/suite/indexing/vector_indexing_suite.hpp"
 
@@ -11,22 +10,10 @@
 BOOST_PYTHON_MODULE(PyLive2D) {
     using namespace boost::python;
 
-    auto level_str = std::getenv("Live2DLogLevel");
-    if (level_str != nullptr) {
-        char* end_ptr = nullptr;
-        auto level = std::strtol(level_str, &end_ptr, 10);
-        if (*end_ptr != '\0') {
-            qWarn("Live2DLogLevel is not a number...");
-        } else {
-            Live2D::Register::set_log_level(level);
-        }
-    }
-
 #ifdef WIN32
     SetConsoleOutputCP(65001);
 #endif
 
-    static auto& instance = QSingletonProductor<Live2D::Register>::get_instance();
     def("set_log_level", Live2D::Register::set_log_level);
 
     class_<std::vector<std::string>>("StringVector")

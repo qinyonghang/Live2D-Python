@@ -9,7 +9,7 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 NAME = "PyLive2D"
-VERSION = "1.0"
+VERSION = "1.1"
 DESCRIPTION = "Live2D Python SDK"
 AUTHOR = "qinyonghang"
 AUTHOR_EMAIL = "yonghang.qin@google.com"
@@ -46,6 +46,7 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+
         cmake_args = [
             "-DPython3_EXECUTABLE=" + sys.executable,
             "-DCMAKE_BUILD_TYPE=Release",
@@ -60,9 +61,9 @@ class CMakeBuild(build_ext):
                 "-A",
                 "x64" if platform.architecture()[0] == "64bit" else "Win32",
             ]
-            build_args += ["--parallel"]  # Use --parallel instead of /maxcpucount
+            build_args += ["--parallel 4"]  # Use --parallel instead of /maxcpucount
         else:
-            build_args += ["--", "-j10"]
+            build_args += ["--", "-j4"]
         build_folder = os.path.abspath(self.build_temp)
 
         if not os.path.exists(build_folder):
@@ -79,10 +80,10 @@ class CMakeBuild(build_ext):
         sys.stdout.flush()
         subprocess.check_call(cmake_build, cwd=build_folder)
 
+        os.makedirs(extdir, exist_ok=True)
         pyd_file = os.path.join(build_folder, "Release", f"{NAME}.pyd")
         shutil.copy(pyd_file, extdir)
         print(f"Copying {pyd_file} to ext directory: {extdir}")
-
         if platform.system() == "Windows":
             other_libs = glob.glob(os.path.join(build_folder, "*.dll"))
         elif platform.system() == "Linux":
@@ -103,9 +104,9 @@ setup(
     install_requires=INSTALL_REQUIRES,
     ext_modules=[CMakeExtension(NAME, ".")],  # Adjust the source directory
     cmdclass=dict(build_ext=CMakeBuild),
-    packages=find_packages(),
-    package_data={"": ["*.pyd", "*.so", "*.a", "*.dll"]},
-    # include_package_data=True,
-    # package_dir={"": "package"},
+    packages=find_packages(where='package'),
+    package_data={"": ["*.pyd", "*.so", "*.dll"]},
+    include_package_data=True,
+    package_dir={"": "package"},
     keywords=["Live2D", "Cubism SDK", "Cubism SDK for Python"],
 )

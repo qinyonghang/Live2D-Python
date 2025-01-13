@@ -103,5 +103,4 @@ set_target_properties(sample PROPERTIES
 target_link_libraries(sample PRIVATE ${PROJECT_NAME})
 include(cmake/glfw.cmake)
 include(cmake/argparse.cmake)
-
 endif ()
