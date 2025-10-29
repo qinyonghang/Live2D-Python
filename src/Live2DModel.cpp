@@ -1,6 +1,9 @@
 #include "Live2DModel.h"
 
 #include <GL/glew.h>
+#ifdef WIN32
+#include <GL/wglew.h>
+#endif
 
 #include <atomic>
 #include <cstdlib>
@@ -19,35 +22,20 @@
 #include "LApp/LAppPal.hpp"
 #include "LApp/LAppView.hpp"
 #include "LApp/TouchManager.hpp"
-#include "LAppDefine.hpp"
-#include "LAppModel.hpp"
-#include "LAppPal.hpp"
-#include "Live2DModel.h"
 #include "Live2DRegister.h"
-// #include "Live2DView.h"
-#include "QException.h"
-
-#ifdef WIN32
-#include <GL/wglew.h>
-#endif
 
 using namespace Live2D::Cubism::Framework;
 
-namespace {
-struct ModelImpl : public QObject {
+namespace Live2D {
+
+struct Model::Impl : public object {
     Live2D::Register _register;
     size_t width;
     size_t height;
-    std::shared_ptr<LAppModel> model;
-    std::shared_ptr<LAppView> view;
-    std::shared_ptr<CubismMatrix44> view_matrix;
-    // std::shared_ptr<Live2D::View> view;
-    // std::shared_ptr<CubismMatrix44> deviceToScreen;
+    unique_ptr_t<LAppModel> model;
+    unique_ptr_t<LAppView> view;
+    unique_ptr_t<CubismMatrix44> view_matrix;
 };
-
-};  // namespace
-
-namespace Live2D {
 
 int32_t Model::init(std::string model_path, size_t width, size_t height) {
     int32_t result{0};
@@ -71,13 +59,13 @@ int32_t Model::init(std::string model_path, size_t width, size_t height) {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        auto impl = std::make_shared<ModelImpl>();
+        auto impl = std::make_shared<Impl>();
 
-        auto view = std::make_shared<LAppView>();
+        auto view = make_unique<LAppView>();
         view->Initialize(width, height);
 
-        auto _viewMatrix = std::make_shared<CubismMatrix44>();
-        auto model = std::make_shared<LAppModel>();
+        auto _viewMatrix = make_unique<CubismMatrix44>();
+        auto model = make_unique<LAppModel>();
 
         model->LoadAssets((path.parent_path().string() + "/").c_str(),
                           path.filename().string().c_str());
@@ -86,32 +74,26 @@ int32_t Model::init(std::string model_path, size_t width, size_t height) {
 
         view->InitializeSprite(width, height);
 
-        impl->model = model;
-        impl->view = view;
-        impl->view_matrix = _viewMatrix;
+        impl->model = move(model);
+        impl->view = move(view);
+        impl->view_matrix = move(_viewMatrix);
         impl->width = width;
         impl->height = height;
 
-        __impl = impl;
+        __impl = std::move(impl);
     } while (0);
 
     return result;
 }
 
-void Model::set_background(std::string background) {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+// void Model::set_background(std::string background) {
+//     auto impl = __impl;
 
-    // impl->view->set_background(background);
-}
+//     // impl->view->set_background(background);
+// }
 
 void Model::draw(size_t width, size_t height) {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     if ((impl->width != width || impl->height != height) && width > 0 && height > 0) {
         impl->view->Initialize(width, height);
@@ -133,19 +115,13 @@ void Model::draw(size_t width, size_t height) {
 }
 
 void Model::set_dragging(float x, float y) {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     impl->view->OnTouchesMoved(x, y, impl->model.get());
 }
 
 bool Model::is_hit(std::string const& area, float x, float y) {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     x = impl->view->_deviceToScreen->TransformX(x);
     y = impl->view->_deviceToScreen->TransformY(y);
@@ -154,10 +130,7 @@ bool Model::is_hit(std::string const& area, float x, float y) {
 }
 
 std::string Model::hit_area(float x, float y) {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     std::string result;
 
@@ -177,10 +150,7 @@ std::string Model::hit_area(float x, float y) {
 }
 
 std::vector<std::string> Model::expression_ids() const {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     std::vector<std::string> result;
     for (auto it = impl->model->_expressions.Begin(); it != impl->model->_expressions.End(); ++it) {
@@ -191,10 +161,7 @@ std::vector<std::string> Model::expression_ids() const {
 }
 
 std::vector<std::string> Model::motion_ids() const {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     std::vector<std::string> result;
     for (auto it = impl->model->_motions.Begin(); it != impl->model->_motions.End(); ++it) {
@@ -205,19 +172,13 @@ std::vector<std::string> Model::motion_ids() const {
 }
 
 void Model::set_expression(std::string const& id) {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     impl->model->SetExpression(id.c_str());
 }
 
 void Model::set_motion(std::string const& id, std::string sound_file, int32_t priority) {
-    auto impl = std::dynamic_pointer_cast<ModelImpl>(__impl);
-    if (impl == nullptr) {
-        QCMTHROW_EXCEPTION("impl is nullptr");
-    }
+    auto impl = __impl.get();
 
     impl->model->StartMotion(id, sound_file, priority, nullptr);
 }

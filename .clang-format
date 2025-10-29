@@ -41,7 +41,7 @@ AllowAllParametersOfDeclarationOnNextLine: true
 
 # include
 SortIncludes: true
-IncludeBlocks:   Regroup
+IncludeBlocks: Preserve
 
 # if condition
 AllowShortIfStatementsOnASingleLine: false

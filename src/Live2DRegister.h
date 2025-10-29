@@ -1,9 +1,11 @@
-#pragma once
+#ifndef LIVE2D_REGISTER_H
+#define LIVE2D_REGISTER_H
 
-#include "QException.h"
-#include "QObject.h"
+#include "qlib/memory.h"
 
 namespace Live2D {
+
+using namespace qlib;
 
 #ifdef WIN32
 #ifdef LIVE2D_EXPORTS
@@ -15,20 +17,18 @@ namespace Live2D {
 #define LIVE2D_API
 #endif
 
-class LIVE2D_API Register : public QObject {
+class LIVE2D_API Register : public object {
 public:
-    Register(QObject* parent = nullptr) : QObject(parent) {
+    Register() {
         int32_t result{init()};
-        if (result != 0) {
-            QCMTHROW_EXCEPTION("init return {}...", result);
-        }
+        throw_if(result != 0, "exception");
     }
     static void set_log_level(size_t level);
 
 protected:
-    std::shared_ptr<QObject> __impl;
-
     int32_t init();
 };
 
 };  // namespace Live2D
+
+#endif

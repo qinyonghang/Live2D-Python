@@ -3,7 +3,8 @@ from PyQt5.QtCore import QTimerEvent, Qt
 from PyQt5.QtGui import QMouseEvent, QCursor
 from PyQt5.QtWidgets import QOpenGLWidget
 import random
-import PyLive2D
+import pylive2d
+
 
 class Live2DWidget(QOpenGLWidget):
     def __init__(self, *args, path: str, parent=None, **kwargs) -> None:
@@ -20,14 +21,14 @@ class Live2DWidget(QOpenGLWidget):
     def initializeGL(self) -> None:
         print("initializeGL: Start:")
         self.makeCurrent()
-        self.model = PyLive2D.Model(self.path, self.width(), self.height())
+        self.model = pylive2d.Model(self.path, self.width(), self.height())
         self.expression_ids = self.model.expression_ids()
         self.motion_ids = self.model.motion_ids()
         self.refresh = self.startTimer(33)
         print("initializeGL: End!")
 
     def paintGL(self) -> None:
-        if hasattr(self, 'model'):
+        if hasattr(self, "model"):
             self.model.draw(self.width(), self.height())
 
     def timerEvent(self, event: QTimerEvent | None):
@@ -58,6 +59,7 @@ class Live2DWidget(QOpenGLWidget):
             self.move(a0.globalPos() - self.drag_position)
         self.model.set_dragging(a0.x(), a0.y())
         a0.accept()
+
 
 if __name__ == "__main__":
     from PyQt5.QtWidgets import QApplication
