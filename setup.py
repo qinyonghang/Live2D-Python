@@ -63,6 +63,7 @@ class CMakeBuild(build_ext):
             ]
             build_args += ["--parallel 4"]  # Use --parallel instead of /maxcpucount
         else:
+            cmake_args += ["-G", "Ninja"]
             build_args += ["--", "-j4"]
         build_folder = os.path.abspath(self.build_temp)
 
@@ -81,7 +82,10 @@ class CMakeBuild(build_ext):
         subprocess.check_call(cmake_build, cwd=build_folder)
 
         os.makedirs(extdir, exist_ok=True)
-        pyd_file = os.path.join(build_folder, "Release", f"{NAME}.pyd")
+        if platform.system() == "Windows":
+            pyd_file = os.path.join(build_folder, "Release", f"{NAME}.pyd")
+        elif platform.system() == "Linux":
+            pyd_file = os.path.join(build_folder, f"{NAME}.so")
         shutil.copy(pyd_file, extdir)
         print(f"Copying {pyd_file} to ext directory: {extdir}")
         if platform.system() == "Windows":
@@ -104,7 +108,7 @@ setup(
     install_requires=INSTALL_REQUIRES,
     ext_modules=[CMakeExtension(NAME, ".")],  # Adjust the source directory
     cmdclass=dict(build_ext=CMakeBuild),
-    packages=find_packages(where='package'),
+    packages=find_packages(where="package"),
     package_data={"": ["*.pyd", "*.so", "*.dll"]},
     include_package_data=True,
     package_dir={"": "package"},

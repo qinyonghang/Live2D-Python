@@ -2,16 +2,16 @@
 
 #include <atomic>
 #include <iostream>
+#include <memory>
 
 #include "CubismFramework.hpp"
 #include "GL/glew.h"
 #include "ICubismAllocator.hpp"
 #include "Math/CubismMatrix44.hpp"
-#include "QException.h"
 
 using namespace Live2D::Cubism::Framework;
 
-namespace {
+namespace Live2D {
 constexpr auto default_level = 2u;
 std::atomic_bool __register{false};
 
@@ -59,9 +59,7 @@ std::shared_ptr<void> destroy;
 void print(char const* message) {
     std::cout << message;
 }
-};  // namespace
 
-namespace Live2D {
 int32_t Register::init() {
     int32_t result{0};
 

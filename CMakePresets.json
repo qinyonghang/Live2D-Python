@@ -7,7 +7,7 @@
     },
     "configurePresets": [
         {
-            "name": "Windows",
+            "name": "windows",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -26,34 +26,19 @@
                 "CMAKE_INSTALL_PREFIX": {
                     "type": "STRING",
                     "value": "${sourceDir}/install"
-                }
-            }
-        },
-        {
-            "name": "Windows x86",
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Windows"
-            },
-            "displayName": "Windows x86 Configuration",
-            "description": "Windows x86 configuration for building the project.",
-            "binaryDir": "${sourceDir}/build/win32",
-            "generator": "Visual Studio 17 2022",
-            "architecture": "Win32",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": {
-                    "type": "STRING",
-                    "value": "Release"
                 },
-                "CMAKE_INSTALL_PREFIX": {
-                    "type": "STRING",
-                    "value": "${sourceDir}/install"
+                "BUILD_EXAMPLES": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                },
+                "BUILD_TESTS": {
+                    "type": "BOOL",
+                    "value": "OFF"
                 }
             }
         },
         {
-            "name": "Linux",
+            "name": "linux",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -75,11 +60,19 @@
                 "GLFW_BUILD_WAYLAND": {
                     "type": "BOOL",
                     "value": "OFF"
+                },
+                "BUILD_EXAMPLES": {
+                    "type": "BOOL",
+                    "value": "OFF"
+                },
+                "BUILD_TESTS": {
+                    "type": "BOOL",
+                    "value": "OFF"
                 }
             }
         },
         {
-            "name": "Linux_Debug",
+            "name": "dlinux",
             "condition": {
                 "type": "equals",
                 "lhs": "${hostSystemName}",
@@ -87,7 +80,7 @@
             },
             "displayName": "Linux Debug Configuration",
             "description": "Linux Debug configuration for building the project.",
-            "binaryDir": "${sourceDir}/build/linux_debug",
+            "binaryDir": "${sourceDir}/build/dlinux",
             "generator": "Ninja",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": {
@@ -107,29 +100,21 @@
     ],
     "buildPresets": [
         {
-            "name": "Windows",
-            "configurePreset": "Windows",
+            "name": "windows",
+            "configurePreset": "windows",
             "configuration": "Release",
             "targets": [
                 "ALL_BUILD"
             ]
         },
         {
-            "name": "Windows x86",
-            "configurePreset": "Windows x86",
-            "configuration": "Release",
-            "targets": [
-                "ALL_BUILD"
-            ]
-        },
-        {
-            "name": "Linux",
-            "configurePreset": "Linux",
+            "name": "linux",
+            "configurePreset": "linux",
             "configuration": "Release"
         },
         {
-            "name": "Linux_Debug",
-            "configurePreset": "Linux_Debug",
+            "name": "dlinux",
+            "configurePreset": "dlinux",
             "configuration": "Debug"
         }
     ]

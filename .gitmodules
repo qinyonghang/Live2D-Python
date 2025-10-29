@@ -1,0 +1,3 @@
+[submodule "qlib"]
+	path = qlib
+	url = git@gitee.com:yonghang_qin/qlib.git

@@ -1,9 +1,16 @@
-#pragma once
+#ifndef LIVE2DMODEL_H
+#define LIVE2DMODEL_H
 
-#include "QException.h"
-#include "QObject.h"
+#include <memory>
+#include <string>
+#include <vector>
+#include <type_traits>
+
+#include "qlib/memory.h"
 
 namespace Live2D {
+
+using namespace qlib;
 
 #ifdef _WIN32
 #ifdef LIVE2D_EXPORTS
@@ -15,7 +22,7 @@ namespace Live2D {
 #define LIVE2D_API
 #endif
 
-class LIVE2D_API Model : public QObject {
+class LIVE2D_API Model final : public object {
 public:
     enum : int32_t {
         OK = 0,
@@ -23,17 +30,14 @@ public:
         ERR_OPENGL_INIT = -2,
     };
 
-    template <typename String>
-    Model(String&& model_path, size_t width, size_t height) : QObject(nullptr) {
+    template <class String>
+    Model(String&& model_path, size_t width, size_t height) {
         int32_t result{init(std::forward<String>(model_path), width, height)};
-        if (result != 0) {
-            QCMTHROW_EXCEPTION("init return {}... model_path={}, width={}, height={}", result,
-                               model_path, width, height);
-        }
+        throw_if(result != 0, "exception");
     }
 
     int32_t init(std::string model_path, size_t width, size_t height);
-    void set_background(std::string background);
+    // void set_background(std::string background);
 
     void draw(size_t width, size_t height);
     void set_dragging(float x, float y);
@@ -45,7 +49,10 @@ public:
     void set_motion(std::string const&, std::string sound_file = "", int32_t priority = 3);
 
 protected:
-    std::shared_ptr<QObject> __impl;
+    class Impl;
+    std::shared_ptr<Impl> __impl;
 };
 
 }  // namespace Live2D
+
+#endif

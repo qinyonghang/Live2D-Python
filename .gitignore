@@ -7,3 +7,5 @@
 **/build
 **/install
 **/__pycache__
+
+third_party

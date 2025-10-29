@@ -22,7 +22,7 @@ BOOST_PYTHON_MODULE(PyLive2D) {
     class_<Live2D::Model, boost::noncopyable>("Model", init<std::string, size_t, size_t>())
         .def("expression_ids", &Live2D::Model::expression_ids)
         .def("motion_ids", &Live2D::Model::motion_ids)
-        .def("set_background", &Live2D::Model::set_background, args("background"))
+        // .def("set_background", &Live2D::Model::set_background, args("background"))
         .def("set_dragging", &Live2D::Model::set_dragging, args("x", "y"))
         .def("set_expression", &Live2D::Model::set_expression, args("id"))
         .def("set_motion", &Live2D::Model::set_motion,
