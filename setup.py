@@ -9,7 +9,7 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 NAME = "pylive2d"
-VERSION = "1.2"
+VERSION = "1.3"
 DESCRIPTION = "Live2D Python SDK"
 AUTHOR = "qinyonghang"
 AUTHOR_EMAIL = "yonghang.qin@google.com"

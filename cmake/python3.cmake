@@ -39,6 +39,3 @@ endif()
 message("Python3_EXECUTABLE=" ${Python3_EXECUTABLE})
 message("Python3_INCLUDE_DIRS=" ${Python3_INCLUDE_DIRS})
 message("Python3_LIBRARIES=" ${Python3_LIBRARIES})
-
-target_include_directories(${PROJECT_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${Python3_LIBRARIES})

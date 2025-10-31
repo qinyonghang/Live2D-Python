@@ -55,6 +55,3 @@ find_package(Boost REQUIRED COMPONENTS python)
 
 message("Boost_INCLUDE_DIRS=${Boost_INCLUDE_DIRS}")
 message("Boost_LIBRARIES=${Boost_LIBRARIES}")
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE BOOST_PYTHON_STATIC_LIB)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})

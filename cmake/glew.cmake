@@ -52,5 +52,3 @@ find_package(GLEW REQUIRED)
 
 message("GLEW_INCLUDE_DIRS: ${GLEW_INCLUDE_DIRS}")
 message("GLEW_LIBRARIES: ${GLEW_LIBRARIES}")
-
-target_link_libraries(${PROJECT_NAME} PRIVATE GLEW::glew_s)

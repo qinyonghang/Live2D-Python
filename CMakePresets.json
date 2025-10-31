@@ -34,6 +34,10 @@
                 "BUILD_TESTS": {
                     "type": "BOOL",
                     "value": "OFF"
+                },
+                "pylive2d_BUILD_EXAMPLES": {
+                    "type": "BOOL",
+                    "value": "ON"
                 }
             }
         },
@@ -68,6 +72,10 @@
                 "BUILD_TESTS": {
                     "type": "BOOL",
                     "value": "OFF"
+                },
+                "pylive2d_BUILD_EXAMPLES": {
+                    "type": "BOOL",
+                    "value": "ON"
                 }
             }
         },
@@ -94,6 +102,10 @@
                 "GLFW_BUILD_WAYLAND": {
                     "type": "BOOL",
                     "value": "OFF"
+                },
+                "pylive2d_BUILD_EXAMPLES": {
+                    "type": "BOOL",
+                    "value": "ON"
                 }
             }
         }

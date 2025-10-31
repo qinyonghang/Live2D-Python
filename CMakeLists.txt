@@ -5,6 +5,9 @@ project(pylive2d)
 include(FetchContent)
 
 option(CMAKE_POSITION_INDEPENDENT_CODE "Build as a PIC library" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_PYTHON_MODULE "Build Python module" OFF)
+option(pylive2d_BUILD_EXAMPLES "Build examples" OFF)
 
 if(MSVC)
     set(CRT MD)
@@ -22,60 +25,12 @@ message(STATUS "CMAKE_TOOLCHAIN_FILE: ${CMAKE_TOOLCHAIN_FILE}")
 message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
 
-add_subdirectory(qlib)
-
 # Find opengl libraries.
 set(FRAMEWORK_SOURCE OpenGL)
 set(OpenGL_GL_PREFERENCE "GLVND")
 find_package(OpenGL REQUIRED)
 message("OpenGL_INCLUDE_DIR=" ${OPENGL_INCLUDE_DIR})
 message("OpenGL_LIBRARIES=" ${OPENGL_LIBRARIES})
-
-set(LAppSrc
-    src/LApp/LAppTextureManager.cpp
-    src/LApp/TouchManager.cpp
-    src/LApp/LAppModel.cpp
-    src/LApp/LAppView.cpp
-    src/LApp/LAppAllocator.cpp
-    src/LApp/LAppPal.cpp
-    src/LApp/LAppWavFileHandler.cpp
-    src/LApp/LAppSprite.cpp
-)
-
-file(GLOB source_files ${PROJECT_SOURCE_DIR}/src/Live2D*.cpp)
-if (BUILD_PYTHON_MODULE)
-add_library(${PROJECT_NAME} MODULE ${source_files} ${LAppSrc})
-else ()
-add_library(${PROJECT_NAME} SHARED ${source_files} ${LAppSrc})
-endif ()
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    PREFIX ""
-    C_STANDARD 17
-    C_STANDARD_REQUIRED ON
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-)
-
-if(BUILD_PYTHON_MODULE AND MSVC)
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".pyd")
-endif()
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${PROJECT_SOURCE_DIR}/src/LApp
-    ${PROJECT_SOURCE_DIR}/src/stb
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENGL_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} PUBLIC qlib::qlib)
-
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-target_compile_definitions(${PROJECT_NAME} PRIVATE LIVE2D_EXPORTS /MP)
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    debug -NODEFAULTLIB:libcmtd.lib
-    optimized -NODEFAULTLIB:libcmt.lib
-)
-endif ()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 find_program(MAKE_EXECUTABLE NAMES make DOC "Path to Make build tool")
@@ -92,41 +47,74 @@ message(FATAL_ERROR
 endif()
 endif()
 
-file(GLOB_RECURSE cmake_source_files ${PROJECT_SOURCE_DIR}/cmake/project/*.cmake)
-foreach(cmake_file IN LISTS cmake_source_files)
-    if(cmake_file MATCHES "python3?\.cmake$")
-        message(STATUS "Including ${cmake_file}")
-        include(${cmake_file})
-    endif()
-endforeach()
+set(source_files
+    src/LApp/LAppTextureManager.cpp
+    src/LApp/TouchManager.cpp
+    src/LApp/LAppModel.cpp
+    src/LApp/LAppView.cpp
+    src/LApp/LAppAllocator.cpp
+    src/LApp/LAppPal.cpp
+    src/LApp/LAppWavFileHandler.cpp
+    src/LApp/LAppSprite.cpp
+)
 
-list(FILTER cmake_source_files EXCLUDE REGEX "python3?\\.cmake$")
-foreach(cmake_file IN LISTS cmake_source_files)
-    message(STATUS "Including ${cmake_file}")
-    include(${cmake_file})
-endforeach()
+if (BUILD_PYTHON_MODULE)
+add_library(pylive2d MODULE ${source_files})
+else ()
+add_library(pylive2d SHARED ${source_files})
+endif ()
 
-if (NOT BUILD_PYTHON_MODULE)
-add_executable(sample ${PROJECT_SOURCE_DIR}/src/main.cpp)
-set_target_properties(sample PROPERTIES
+set_target_properties(pylive2d PROPERTIES
+    PREFIX ""
     C_STANDARD 17
     C_STANDARD_REQUIRED ON
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
 
-target_link_libraries(sample PRIVATE ${PROJECT_NAME})
-# include(cmake/glfw.cmake)
-# include(cmake/argparse.cmake)
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+target_compile_definitions(pylive2d PRIVATE LIVE2D_EXPORTS /MP)
+target_link_libraries(pylive2d PRIVATE
+    debug -NODEFAULTLIB:libcmtd.lib
+    optimized -NODEFAULTLIB:libcmt.lib
+)
+endif ()
 
-FetchContent_Declare(
-  glfw
-  GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG        3.4
+target_include_directories(pylive2d PRIVATE
+    ${PROJECT_SOURCE_DIR}/src/LApp
+    ${PROJECT_SOURCE_DIR}/src/stb
+)
+target_include_directories(pylive2d PUBLIC
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/src
 )
 
-FetchContent_MakeAvailable(glfw)
+target_link_libraries(pylive2d PRIVATE ${OPENGL_LIBRARIES})
+include(${PROJECT_SOURCE_DIR}/cmake/glew.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/CubismSdk.cmake)
+target_link_libraries(pylive2d PUBLIC live2d)
 
-target_link_libraries(sample PRIVATE glfw)
+if(BUILD_PYTHON_MODULE)
+if(MSVC)
+set_target_properties(pylive2d PROPERTIES SUFFIX ".pyd")
+endif()
+include(${PROJECT_SOURCE_DIR}/cmake/python3.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/boost.cmake)
+target_sources(pylive2d PRIVATE ${PROJECT_SOURCE_DIR}/src/wrapper.cpp)
+target_include_directories(pylive2d PRIVATE ${Python3_INCLUDE_DIRS})
+target_link_libraries(pylive2d PRIVATE ${Python3_LIBRARIES})
+target_compile_definitions(pylive2d PRIVATE BOOST_PYTHON_STATIC_LIB)
+target_link_libraries(pylive2d PRIVATE ${Boost_LIBRARIES})
+endif()
 
-endif ()
+add_subdirectory(qlib)
+target_link_libraries(pylive2d PUBLIC qlib::qlib)
+
+if (BUILD_EXAMPLES OR pylive2d_BUILD_EXAMPLES)
+file(GLOB examples ${CMAKE_CURRENT_LIST_DIR}/examples/*)
+foreach(example ${examples})
+    if (IS_DIRECTORY ${example} AND EXISTS ${example}/CMakeLists.txt)
+        add_subdirectory(${example})
+    endif ()
+endforeach()
+endif()

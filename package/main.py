@@ -13,9 +13,9 @@ class Live2DWidget(QOpenGLWidget):
             raise FileNotFoundError(f"path({path}) not found...")
 
         super().__init__(parent)
-        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground, True)
+        # self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        # self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        # self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground, True)
         self.setMouseTracking(True)
 
     def initializeGL(self) -> None:

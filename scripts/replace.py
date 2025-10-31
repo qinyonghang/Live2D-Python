@@ -25,5 +25,7 @@ if __name__ == "__main__":
     file_path = sys.argv[1]
     pattern = sys.argv[2]
     replacement = sys.argv[3]
-    print(f"Replacing content in {file_path}, pattern: {pattern}, replacement: {replacement}")
+    print(
+        f"Replacing content in {file_path}, pattern: {pattern}, replacement: {replacement}"
+    )
     replace(file_path, pattern, replacement)
